@@ -22,7 +22,7 @@ public class Movimiento {
     @Column(name = "monto", nullable = false, precision = 15, scale = 2)
     private BigDecimal monto;
 
-    // fecha del movimiento (ya la tenías)
+    // fecha del movimiento
     @Column(name = "fecha", nullable = false)
     private LocalDateTime fecha = LocalDateTime.now();
 
