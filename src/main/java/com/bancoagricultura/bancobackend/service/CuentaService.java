@@ -1,0 +1,23 @@
+package com.bancoagricultura.bancobackend.service;
+
+import com.bancoagricultura.bancobackend.entity.CuentaBancaria;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+/**Interfaz de servicio para operaciones sobre cuentas bancarias. **/
+
+public interface CuentaService {
+
+
+    CuentaBancaria createCuenta(Integer clienteId);
+
+
+    List<CuentaBancaria> findCuentasByDui(String dui);
+
+
+    void abonarEfectivo(String numeroCuenta, BigDecimal monto);
+
+
+    void retirarEfectivo(String numeroCuenta, BigDecimal monto);
+}

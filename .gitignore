@@ -1,0 +1,65 @@
+# =========================
+#  IGNORAR ARCHIVOS COMUNES DE MAVEN Y SPRING BOOT
+# =========================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# =========================
+#  ARCHIVOS SENSIBLES / CONFIGURACIONES LOCALES
+# =========================
+application-local.properties
+application-*.yml
+*.env
+*.log
+logs/
+*.bak
+*.tmp
+
+# =========================
+#  SPRING TOOL SUITE / ECLIPSE / STS
+# =========================
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# =========================
+#  INTELLIJ IDEA
+# =========================
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# =========================
+#  NETBEANS
+# =========================
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# =========================
+#  VISUAL STUDIO CODE
+# =========================
+.vscode/
+
+# =========================
+#  SISTEMAS OPERATIVOS
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+#  OTROS
+# =========================
+HELP.md
