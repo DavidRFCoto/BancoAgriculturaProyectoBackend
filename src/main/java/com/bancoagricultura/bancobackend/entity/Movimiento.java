@@ -22,7 +22,6 @@ public class Movimiento {
     @Column(name = "monto", nullable = false, precision = 15, scale = 2)
     private BigDecimal monto;
 
-    // fecha del movimiento
     @Column(name = "fecha", nullable = false)
     private LocalDateTime fecha = LocalDateTime.now();
 
@@ -31,6 +30,13 @@ public class Movimiento {
 
     @Column(name = "id_movimiento_relacionado")
     private Integer idMovimientoRelacionado;
+
+    //  CAMPOS PARA COMISION
+    @Column(name = "monto_comision", precision = 10, scale = 2)
+    private BigDecimal montoComision; // (Comentario: Ej: 5.00)
+
+    @Column(name = "id_dependiente_comision")
+    private Integer idDependienteComision; // ID del dependiente que gano la comision
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_cuenta", nullable = false)
@@ -42,7 +48,8 @@ public class Movimiento {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    public Movimiento() {}
+    public Movimiento() {
+    }
 
     public Movimiento(String tipoMovimiento, BigDecimal monto, String descripcion) {
         this.tipoMovimiento = tipoMovimiento;
@@ -51,7 +58,7 @@ public class Movimiento {
         this.fecha = LocalDateTime.now();
     }
 
-    // --- Lifecycle callbacks para timestamps ---
+    // --- Callbacks @PrePersist y @PreUpdate  ---
     @PrePersist
     protected void onCreate() {
         LocalDateTime now = LocalDateTime.now();
@@ -70,31 +77,93 @@ public class Movimiento {
     }
     // --- fin callbacks ---
 
-    // Getters / Setters
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    // --- Getters / Setters ---
 
-    public String getTipoMovimiento() { return tipoMovimiento; }
-    public void setTipoMovimiento(String tipoMovimiento) { this.tipoMovimiento = tipoMovimiento; }
+    public BigDecimal getMontoComision() {
+        return montoComision;
+    }
 
-    public BigDecimal getMonto() { return monto; }
-    public void setMonto(BigDecimal monto) { this.monto = monto; }
+    public void setMontoComision(BigDecimal montoComision) {
+        this.montoComision = montoComision;
+    }
 
-    public LocalDateTime getFecha() { return fecha; }
-    public void setFecha(LocalDateTime fecha) { this.fecha = fecha; }
+    public Integer getIdDependienteComision() {
+        return idDependienteComision;
+    }
 
-    public String getDescripcion() { return descripcion; }
-    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public void setIdDependienteComision(Integer idDependienteComision) {
+        this.idDependienteComision = idDependienteComision;
+    }
 
-    public Integer getIdMovimientoRelacionado() { return idMovimientoRelacionado; }
-    public void setIdMovimientoRelacionado(Integer idMovimientoRelacionado) { this.idMovimientoRelacionado = idMovimientoRelacionado; }
+    public Integer getId() {
+        return id;
+    }
 
-    public CuentaBancaria getCuenta() { return cuenta; }
-    public void setCuenta(CuentaBancaria cuenta) { this.cuenta = cuenta; }
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public String getTipoMovimiento() {
+        return tipoMovimiento;
+    }
 
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+    public void setTipoMovimiento(String tipoMovimiento) {
+        this.tipoMovimiento = tipoMovimiento;
+    }
+
+    public BigDecimal getMonto() {
+        return monto;
+    }
+
+    public void setMonto(BigDecimal monto) {
+        this.monto = monto;
+    }
+
+    public LocalDateTime getFecha() {
+        return fecha;
+    }
+
+    public void setFecha(LocalDateTime fecha) {
+        this.fecha = fecha;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public Integer getIdMovimientoRelacionado() {
+        return idMovimientoRelacionado;
+    }
+
+    public void setIdMovimientoRelacionado(Integer idMovimientoRelacionado) {
+        this.idMovimientoRelacionado = idMovimientoRelacionado;
+    }
+
+    public CuentaBancaria getCuenta() {
+        return cuenta;
+    }
+
+    public void setCuenta(CuentaBancaria cuenta) {
+        this.cuenta = cuenta;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

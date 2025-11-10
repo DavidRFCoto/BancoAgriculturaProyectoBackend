@@ -3,11 +3,15 @@ package com.bancoagricultura.bancobackend.controller;
 import com.bancoagricultura.bancobackend.dto.EmpleadoDTO;
 import com.bancoagricultura.bancobackend.dto.EmpleadoRegistroDTO;
 import com.bancoagricultura.bancobackend.dto.PrestamoDTO;
+import com.bancoagricultura.bancobackend.dto.AccionPersonalRegistroDTO;
+import com.bancoagricultura.bancobackend.dto.AccionPersonalDTO;
 import com.bancoagricultura.bancobackend.entity.Empleado;
 import com.bancoagricultura.bancobackend.entity.Prestamo;
 import com.bancoagricultura.bancobackend.entity.Rol;
+import com.bancoagricultura.bancobackend.entity.AccionPersonal;
 import com.bancoagricultura.bancobackend.repository.EmpleadoRepository;
 import com.bancoagricultura.bancobackend.repository.RolRepository;
+import com.bancoagricultura.bancobackend.repository.AccionPersonalRepository;
 import com.bancoagricultura.bancobackend.service.PrestamoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,42 +26,54 @@ public class GerenteController {
 
     private final EmpleadoRepository empleadoRepository;
     private final RolRepository rolRepository;
+
+    private final AccionPersonalRepository accionPersonalRepository;
     private final PrestamoService prestamoService;
 
     @Autowired
     public GerenteController(EmpleadoRepository empleadoRepository,
                              RolRepository rolRepository,
+                             AccionPersonalRepository accionPersonalRepository,
                              PrestamoService prestamoService) {
         this.empleadoRepository = empleadoRepository;
         this.rolRepository = rolRepository;
+        this.accionPersonalRepository = accionPersonalRepository;
         this.prestamoService = prestamoService;
     }
 
     /**
-     * Endpoint para la Tarea del Gerente: "Ingresar nuevos empleados"
+     * Endpoint para solicitar Contratacion
      */
-    @PostMapping("/empleados")
-    public ResponseEntity<?> registrarEmpleado(@RequestBody EmpleadoRegistroDTO dto) {
+    @PostMapping("/solicitar-contratacion")
+    public ResponseEntity<?> solicitarContratacion(@RequestBody AccionPersonalRegistroDTO dto) {
         try {
-            // ... (código para buscar Rol y crear Empleado se queda igual) ...
+            // Buscar el Rol del nuevo empleado
             Rol rol = rolRepository.findById(dto.getRolId())
                     .orElseThrow(() -> new NoSuchElementException("Rol no encontrado con ID: " + dto.getRolId()));
 
-            Empleado nuevoEmpleado = new Empleado();
-            // ... (setear nombre, puesto, salario, rol) ...
-            nuevoEmpleado.setEstado("activo");
+            // Buscar al Gerente que solicita
+            Empleado gerente = empleadoRepository.findById(dto.getGerenteSolicitanteId())
+                    .orElseThrow(() -> new NoSuchElementException("Gerente solicitante no encontrado con ID: " + dto.getGerenteSolicitanteId()));
 
-            // 4. Guardar en la BD
-            Empleado empleadoGuardado = empleadoRepository.save(nuevoEmpleado);
+            // Crear la Accion de Personal
+            AccionPersonal ap = new AccionPersonal();
+            ap.setTipoAccion("CONTRATACION");
+            ap.setEstado("pendiente");
+            ap.setNombreNuevoEmpleado(dto.getNombre());
+            ap.setPuestoNuevoEmpleado(dto.getPuesto());
+            ap.setSalarioNuevoEmpleado(dto.getSalario());
+            ap.setRolNuevoEmpleado(rol);
+            ap.setGerenteSolicitante(gerente);
 
-            // 5. ¡ARREGLO! Volver a buscar el empleado guardado USANDO EL JOIN FETCH
-            // para tener el objeto Rol completo antes de crear el DTO.
-            Empleado empleadoCompleto = empleadoRepository.findByIdWithRol(empleadoGuardado.getId())
-                    .orElseThrow(() -> new NoSuchElementException("Error al recuperar empleado post-guardado."));
+            // Guardar la solicitud
+            AccionPersonal apGuardada = accionPersonalRepository.save(ap);
 
-            // 6. Convertir a DTO y devolver
-            EmpleadoDTO empleadoDTO = new EmpleadoDTO(empleadoCompleto);
-            return ResponseEntity.status(201).body(empleadoDTO);
+            // Buscar con JOIN FETCH
+            AccionPersonal apCompleta = accionPersonalRepository.findByIdWithDetails(apGuardada.getId())
+                    .orElseThrow(() -> new NoSuchElementException("Error al recargar accion post-guardado."));
+
+            // Devolver el DTO
+            return ResponseEntity.status(201).body(new AccionPersonalDTO(apCompleta));
 
         } catch (NoSuchElementException e) {
             return ResponseEntity.status(400).body(java.util.Collections.singletonMap("error", e.getMessage()));
@@ -67,7 +83,6 @@ public class GerenteController {
     }
 
     // ENDPOINTS PARA GESTION DE PRESTAMOS
-
     @GetMapping("/prestamos/pendientes")
     public ResponseEntity<?> getPrestamosPendientes() {
         List<Prestamo> pendientes = prestamoService.findPrestamosPendientes();
@@ -120,4 +135,6 @@ public class GerenteController {
             return ResponseEntity.status(500).body(java.util.Collections.singletonMap("error", e.getMessage()));
         }
     }
+
+
 }

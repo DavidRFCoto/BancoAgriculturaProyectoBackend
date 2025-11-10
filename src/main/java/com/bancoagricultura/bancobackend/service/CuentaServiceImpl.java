@@ -6,35 +6,39 @@ import com.bancoagricultura.bancobackend.entity.Movimiento;
 import com.bancoagricultura.bancobackend.repository.ClienteRepository;
 import com.bancoagricultura.bancobackend.repository.CuentaRepository;
 import com.bancoagricultura.bancobackend.repository.MovimientoRepository;
-import com.bancoagricultura.bancobackend.service.CuentaService;
+import com.bancoagricultura.bancobackend.repository.DependienteRepository;
 import com.bancoagricultura.bancobackend.util.NumeroCuentaGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
 
-/**
- * Implementacion del servicio de cuentas.
- */
 @Service
 public class CuentaServiceImpl implements CuentaService {
+
+    private static final BigDecimal PORCENTAJE_COMISION = new BigDecimal("0.05"); // 5%
 
     private final CuentaRepository cuentaRepository;
     private final ClienteRepository clienteRepository;
     private final MovimientoRepository movimientoRepository;
     private final NumeroCuentaGenerator numeroCuentaGenerator;
+    private final DependienteRepository dependienteRepository;
 
     public CuentaServiceImpl(CuentaRepository cuentaRepository,
                              ClienteRepository clienteRepository,
                              MovimientoRepository movimientoRepository,
-                             NumeroCuentaGenerator numeroCuentaGenerator) {
+                             NumeroCuentaGenerator numeroCuentaGenerator,
+                             DependienteRepository dependienteRepository) {
         this.cuentaRepository = cuentaRepository;
         this.clienteRepository = clienteRepository;
         this.movimientoRepository = movimientoRepository;
         this.numeroCuentaGenerator = numeroCuentaGenerator;
+        this.dependienteRepository = dependienteRepository;
     }
 
+    // El metodo crear Cuenta se queda igua
     @Override
     @Transactional
     public CuentaBancaria createCuenta(Integer clienteId) {
@@ -46,7 +50,6 @@ public class CuentaServiceImpl implements CuentaService {
             throw new IllegalArgumentException("El cliente ya tiene 3 cuentas. No se puede crear mas.");
         }
 
-        // Genera numero de cuenta unico (se asegura en el util)
         String numeroCuenta = numeroCuentaGenerator.generarNumeroCuentaUnico();
 
         CuentaBancaria cuenta = new CuentaBancaria();
@@ -56,12 +59,12 @@ public class CuentaServiceImpl implements CuentaService {
 
         CuentaBancaria guardada = cuentaRepository.save(cuenta);
 
-        // Mantener la referencia bidireccional en memoria
         cliente.getCuentas().add(guardada);
 
         return guardada;
     }
 
+    //  metodo findCuentasByDui
     @Override
     @Transactional(readOnly = true)
     public List<CuentaBancaria> findCuentasByDui(String dui) {
@@ -70,9 +73,11 @@ public class CuentaServiceImpl implements CuentaService {
                 .orElseGet(List::of);
     }
 
+
+    // METODO ABONAR
     @Override
     @Transactional
-    public void abonarEfectivo(String numeroCuenta, BigDecimal monto) {
+    public void abonarEfectivo(String numeroCuenta, BigDecimal monto, Integer dependienteId) {
         if (monto == null || monto.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("El monto a abonar debe ser mayor que cero.");
         }
@@ -80,7 +85,7 @@ public class CuentaServiceImpl implements CuentaService {
         CuentaBancaria cuenta = cuentaRepository.findByNumeroCuenta(numeroCuenta)
                 .orElseThrow(() -> new IllegalArgumentException("Cuenta no encontrada: " + numeroCuenta));
 
-        // actualizar saldo
+        // (Comentario: actualizar saldo)
         BigDecimal nuevoSaldo = cuenta.getSaldo().add(monto);
         cuenta.setSaldo(nuevoSaldo);
         cuentaRepository.save(cuenta);
@@ -88,12 +93,26 @@ public class CuentaServiceImpl implements CuentaService {
         // registrar movimiento
         Movimiento movimiento = new Movimiento("DEPOSITO", monto, "Abono realizado");
         movimiento.setCuenta(cuenta);
+
+        //  LOGICA DE COMISION
+        if (dependienteId != null) {
+            // Verificamos que el dependiente exista)
+            if (!dependienteRepository.existsById(dependienteId)) {
+                throw new NoSuchElementException("Dependiente no encontrado: " + dependienteId);
+            }
+            //  Calculamos la comision
+            BigDecimal comision = monto.multiply(PORCENTAJE_COMISION).setScale(2, BigDecimal.ROUND_HALF_UP);
+            movimiento.setMontoComision(comision);
+            movimiento.setIdDependienteComision(dependienteId);
+        }
+
         movimientoRepository.save(movimiento);
     }
 
+    // METODO RETIRAR
     @Override
     @Transactional
-    public void retirarEfectivo(String numeroCuenta, BigDecimal monto) {
+    public void retirarEfectivo(String numeroCuenta, BigDecimal monto, Integer dependienteId) {
         if (monto == null || monto.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("El monto a retirar debe ser mayor que cero.");
         }
@@ -105,15 +124,26 @@ public class CuentaServiceImpl implements CuentaService {
             throw new IllegalArgumentException("Saldo insuficiente para realizar el retiro.");
         }
 
-        // actualizar saldo
+        //  actualizar saldo
         BigDecimal nuevoSaldo = cuenta.getSaldo().subtract(monto);
         cuenta.setSaldo(nuevoSaldo);
         cuentaRepository.save(cuenta);
 
-        // registrar movimiento
+        //  registrar movimiento
         Movimiento movimiento = new Movimiento("RETIRO", monto, "Retiro realizado");
         movimiento.setCuenta(cuenta);
+
+        //  LOGICA DE COMISION
+        if (dependienteId != null) {
+            if (!dependienteRepository.existsById(dependienteId)) {
+                throw new NoSuchElementException("Dependiente no encontrado: " + dependienteId);
+            }
+            BigDecimal comision = monto.multiply(PORCENTAJE_COMISION).setScale(2, BigDecimal.ROUND_HALF_UP);
+            movimiento.setMontoComision(comision);
+            movimiento.setIdDependienteComision(dependienteId);
+        }
+
+
         movimientoRepository.save(movimiento);
     }
 }
-
