@@ -37,7 +37,7 @@ public class DependienteController {
     }
 
     @PostMapping("/abonarefectivo") // (Comentario: CAMBIO de @POST y @Path)
-    public ResponseEntity<?> abonarEfectivo(@RequestBody TransaccionDTO transaccion) { // (Comentario: CAMBIO a @RequestBody)
+    public ResponseEntity<?> abonarEfectivo(@RequestBody TransaccionDTO transaccion) { // CAMBIO a @RequestBody
         try {
             cuentaService.abonarEfectivo(
                     transaccion.getNumeroCuenta(),

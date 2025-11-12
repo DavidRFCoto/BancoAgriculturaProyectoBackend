@@ -11,4 +11,6 @@ public interface EmpleadoRepository extends JpaRepository<Empleado, Integer> {
 
     @Query("SELECT e FROM Empleado e JOIN FETCH e.rol WHERE e.id = :id")
     Optional<Empleado> findByIdWithRol(@Param("id") Integer id);
+
+    Optional<Empleado> findByUsername(String username);
 }
