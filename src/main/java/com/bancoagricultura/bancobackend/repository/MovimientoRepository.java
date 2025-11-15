@@ -4,10 +4,14 @@ import com.bancoagricultura.bancobackend.entity.Movimiento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface MovimientoRepository extends JpaRepository<Movimiento, Integer> {
     List<Movimiento> findByCuentaIdOrderByFechaDesc(Integer cuentaId);
     @Query("SELECT m FROM Movimiento m JOIN FETCH m.cuenta c JOIN FETCH c.cliente cl ORDER BY m.fecha DESC")
     List<Movimiento> findAllWithCuentaAndCliente();
+
+    @Query("SELECT COALESCE(SUM(m.montoComision), 0) FROM Movimiento m WHERE m.idDependienteComision = :dependienteId")
+    BigDecimal sumComisionByDependienteId(Integer dependienteId);
 }

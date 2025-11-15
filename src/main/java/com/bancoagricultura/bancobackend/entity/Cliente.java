@@ -9,7 +9,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "clientes", uniqueConstraints = {
-        @UniqueConstraint(name = "ux_clientes_dui", columnNames = {"dui"})
+        @UniqueConstraint(name = "ux_clientes_dui", columnNames = {"dui"}),
+        @UniqueConstraint(name = "ux_clientes_usuario", columnNames = {"usuario"})
 })
 public class Cliente {
 
@@ -21,14 +22,26 @@ public class Cliente {
     @Column(name = "nombre", nullable = false, length = 200)
     private String nombre;
 
+    @Column(name = "apellidos", length = 200)
+    private String apellidos;
+
     @Column(name = "dui", nullable = false, length = 20)
     private String dui;
+
+    @Column(name = "usuario", unique = true, length = 50)
+    private String usuario;
+
+    @Column(name = "password", length = 255)
+    private String password;
 
     @Column(name = "direccion", length = 255)
     private String direccion;
 
     @Column(name = "correo", length = 150)
     private String correo;
+
+    @Column(name = "genero", length = 20)
+    private String genero;
 
     @Column(name = "salario", precision = 15, scale = 2)
     private BigDecimal salario = BigDecimal.ZERO;
@@ -81,14 +94,26 @@ public class Cliente {
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 
+    public String getApellidos() { return apellidos; }
+    public void setApellidos(String apellidos) { this.apellidos = apellidos; }
+
     public String getDui() { return dui; }
     public void setDui(String dui) { this.dui = dui; }
+
+    public String getUsuario() { return usuario; }
+    public void setUsuario(String usuario) { this.usuario = usuario; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
     public String getDireccion() { return direccion; }
     public void setDireccion(String direccion) { this.direccion = direccion; }
 
     public String getCorreo() { return correo; }
     public void setCorreo(String correo) { this.correo = correo; }
+
+    public String getGenero() { return genero; }
+    public void setGenero(String genero) { this.genero = genero; }
 
     public BigDecimal getSalario() { return salario; }
     public void setSalario(BigDecimal salario) { this.salario = salario; }

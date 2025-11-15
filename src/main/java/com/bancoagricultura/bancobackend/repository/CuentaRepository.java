@@ -13,4 +13,6 @@ public interface CuentaRepository extends JpaRepository<CuentaBancaria, Integer>
     Optional<CuentaBancaria> findByNumeroCuenta(@Param("numeroCuenta") String numeroCuenta);
 
     List<CuentaBancaria> findByClienteId(Integer clienteId);
+
+    Optional<CuentaBancaria> findByIdAndClienteId(Integer id, Integer clienteId);
 }

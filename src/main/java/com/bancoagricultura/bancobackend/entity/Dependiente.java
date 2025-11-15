@@ -16,6 +16,12 @@ public class Dependiente {
     @Column(name = "nombre", nullable = false, length = 255)
     private String nombre;
 
+    @Column(name = "usuario", unique = true, length = 50)
+    private String usuario;
+
+    @Column(name = "password", length = 255)
+    private String password;
+
     // ganan 5% de comision
     @Column(name = "comision", nullable = false, precision = 5, scale = 2)
     private BigDecimal comision = new BigDecimal("5.00");
@@ -58,6 +64,10 @@ public class Dependiente {
     public void setId(Integer id) { this.id = id; }
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
+    public String getUsuario() { return usuario; }
+    public void setUsuario(String usuario) { this.usuario = usuario; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
     public BigDecimal getComision() { return comision; }
     public void setComision(BigDecimal comision) { this.comision = comision; }
     public String getEstado() { return estado; }

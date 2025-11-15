@@ -1,7 +1,6 @@
 package com.bancoagricultura.bancobackend.controller;
 
 import com.bancoagricultura.bancobackend.dto.EmpleadoDTO;
-import com.bancoagricultura.bancobackend.dto.EmpleadoRegistroDTO;
 import com.bancoagricultura.bancobackend.dto.PrestamoDTO;
 import com.bancoagricultura.bancobackend.dto.AccionPersonalRegistroDTO;
 import com.bancoagricultura.bancobackend.dto.AccionPersonalDTO;

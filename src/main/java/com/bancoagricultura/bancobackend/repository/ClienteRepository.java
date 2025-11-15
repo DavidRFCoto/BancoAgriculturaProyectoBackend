@@ -19,5 +19,7 @@ import java.util.Optional;
 
 public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
     Optional<Cliente> findByDui(String dui);
+
+    Optional<Cliente> findByUsuarioAndActivoTrue(String usuario);
 }
 

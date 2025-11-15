@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface CuentaService {
 
-    CuentaBancaria createCuenta(Integer clienteId);
+    CuentaBancaria createCuenta(Integer clienteId, String tipoCuenta);
 
     List<CuentaBancaria> findCuentasByDui(String dui);
 

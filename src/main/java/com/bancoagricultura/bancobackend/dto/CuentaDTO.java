@@ -8,6 +8,7 @@ public class CuentaDTO {
 
     private Integer id;
     private String numeroCuenta;
+    private String tipoCuenta;
     private BigDecimal saldo;
     private LocalDateTime fechaApertura;
     private Integer clienteId;
@@ -15,6 +16,7 @@ public class CuentaDTO {
     public CuentaDTO(CuentaBancaria cuenta) {
         this.id = cuenta.getId();
         this.numeroCuenta = cuenta.getNumeroCuenta();
+        this.tipoCuenta = cuenta.getTipoCuenta();
         this.saldo = cuenta.getSaldo();
         this.fechaApertura = cuenta.getFechaApertura();
         this.clienteId = cuenta.getCliente().getId();
@@ -25,6 +27,9 @@ public class CuentaDTO {
     public void setId(Integer id) { this.id = id; }
     public String getNumeroCuenta() { return numeroCuenta; }
     public void setNumeroCuenta(String numeroCuenta) { this.numeroCuenta = numeroCuenta; }
+
+    public String getTipoCuenta() { return tipoCuenta; }
+    public void setTipoCuenta(String tipoCuenta) { this.tipoCuenta = tipoCuenta; }
     public BigDecimal getSaldo() { return saldo; }
     public void setSaldo(BigDecimal saldo) { this.saldo = saldo; }
     public LocalDateTime getFechaApertura() { return fechaApertura; }

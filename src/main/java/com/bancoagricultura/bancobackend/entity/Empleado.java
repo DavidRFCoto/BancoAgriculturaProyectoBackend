@@ -16,6 +16,12 @@ public class Empleado {
     @Column(name = "nombre", nullable = false, length = 200)
     private String nombre;
 
+    @Column(name = "usuario", unique = true, length = 50)
+    private String usuario;
+
+    @Column(name = "password", length = 255)
+    private String password;
+
     @Column(name = "puesto", nullable = false, length = 100)
     private String puesto; // Ej: "Cajero", "Gerente de Sucursal"
 
@@ -71,6 +77,22 @@ public class Empleado {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public String getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getPuesto() {

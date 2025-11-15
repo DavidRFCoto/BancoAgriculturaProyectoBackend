@@ -1,14 +1,21 @@
 package com.bancoagricultura.bancobackend.controller;
 
-import com.bancoagricultura.bancobackend.dto.*;
+import com.bancoagricultura.bancobackend.dto.CajeroTransaccionDTO;
+import com.bancoagricultura.bancobackend.dto.ClienteDTO;
+import com.bancoagricultura.bancobackend.dto.ClienteRegistroDTO;
+import com.bancoagricultura.bancobackend.dto.DependienteDTO;
+import com.bancoagricultura.bancobackend.dto.DependienteRegistroDTO;
+import com.bancoagricultura.bancobackend.dto.PrestamoDTO;
+import com.bancoagricultura.bancobackend.dto.PrestamoSolicitudDTO;
 import com.bancoagricultura.bancobackend.entity.Cliente;
 import com.bancoagricultura.bancobackend.entity.CuentaBancaria;
-import com.bancoagricultura.bancobackend.dto.*;
-import com.bancoagricultura.bancobackend.entity.*;
-import com.bancoagricultura.bancobackend.repository.*;
+import com.bancoagricultura.bancobackend.entity.Dependiente;
 import com.bancoagricultura.bancobackend.entity.Prestamo;
+import com.bancoagricultura.bancobackend.entity.Rol;
 import com.bancoagricultura.bancobackend.repository.ClienteRepository;
 import com.bancoagricultura.bancobackend.repository.CuentaRepository;
+import com.bancoagricultura.bancobackend.repository.DependienteRepository;
+import com.bancoagricultura.bancobackend.repository.RolRepository;
 import com.bancoagricultura.bancobackend.service.CuentaService;
 import com.bancoagricultura.bancobackend.service.PrestamoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,8 +127,16 @@ public class CajeroController {
     @PostMapping("/clientes")
     public ResponseEntity<?> registrarCliente(@RequestBody ClienteRegistroDTO clienteDTO) {
         try {
-            Cliente nuevoCliente = new Cliente(clienteDTO.getNombre(), clienteDTO.getDui());
+            Cliente nuevoCliente = new Cliente();
+            nuevoCliente.setNombre(clienteDTO.getNombre());
+            nuevoCliente.setApellidos(clienteDTO.getApellidos());
+            nuevoCliente.setGenero(clienteDTO.getGenero());
+            nuevoCliente.setDui(clienteDTO.getDui());
+            nuevoCliente.setDireccion(clienteDTO.getDireccion());
             nuevoCliente.setSalario(clienteDTO.getSalario());
+            if (clienteDTO.getPassword() != null && !clienteDTO.getPassword().trim().isEmpty()) {
+                nuevoCliente.setPassword(clienteDTO.getPassword());
+            }
             Cliente clienteGuardado = clienteRepository.save(nuevoCliente);
             ClienteDTO respuestaDTO = new ClienteDTO(clienteGuardado);
             return ResponseEntity.status(201).body(respuestaDTO);

@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.math.RoundingMode;
 
 @Service
 public class CuentaServiceImpl implements CuentaService {
@@ -38,10 +39,26 @@ public class CuentaServiceImpl implements CuentaService {
         this.dependienteRepository = dependienteRepository;
     }
 
+    private String normalizarTipoCuenta(String tipoCuenta) {
+        if (tipoCuenta == null || tipoCuenta.trim().isEmpty()) {
+            return "Cuenta Corriente";
+        }
+
+        String valor = tipoCuenta.trim().toLowerCase();
+        if (valor.contains("ahorro")) {
+            return "Cuenta de Ahorro";
+        }
+        if (valor.contains("corriente")) {
+            return "Cuenta Corriente";
+        }
+
+        throw new IllegalArgumentException("Tipo de cuenta no válido. Use 'corriente' o 'ahorro'.");
+    }
+
     // El metodo crear Cuenta se queda igua
     @Override
     @Transactional
-    public CuentaBancaria createCuenta(Integer clienteId) {
+    public CuentaBancaria createCuenta(Integer clienteId, String tipoCuenta) {
         Cliente cliente = clienteRepository.findById(clienteId)
                 .orElseThrow(() -> new IllegalArgumentException("Cliente no encontrado: " + clienteId));
 
@@ -51,11 +68,13 @@ public class CuentaServiceImpl implements CuentaService {
         }
 
         String numeroCuenta = numeroCuentaGenerator.generarNumeroCuentaUnico();
+        String tipoNormalizado = normalizarTipoCuenta(tipoCuenta);
 
         CuentaBancaria cuenta = new CuentaBancaria();
         cuenta.setNumeroCuenta(numeroCuenta);
         cuenta.setCliente(cliente);
         cuenta.setSaldo(BigDecimal.ZERO);
+        cuenta.setTipoCuenta(tipoNormalizado);
 
         CuentaBancaria guardada = cuentaRepository.save(cuenta);
 
@@ -101,7 +120,7 @@ public class CuentaServiceImpl implements CuentaService {
                 throw new NoSuchElementException("Dependiente no encontrado: " + dependienteId);
             }
             //  Calculamos la comision
-            BigDecimal comision = monto.multiply(PORCENTAJE_COMISION).setScale(2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal comision = monto.multiply(PORCENTAJE_COMISION).setScale(2, RoundingMode.HALF_UP);
             movimiento.setMontoComision(comision);
             movimiento.setIdDependienteComision(dependienteId);
         }
@@ -138,7 +157,7 @@ public class CuentaServiceImpl implements CuentaService {
             if (!dependienteRepository.existsById(dependienteId)) {
                 throw new NoSuchElementException("Dependiente no encontrado: " + dependienteId);
             }
-            BigDecimal comision = monto.multiply(PORCENTAJE_COMISION).setScale(2, BigDecimal.ROUND_HALF_UP);
+            BigDecimal comision = monto.multiply(PORCENTAJE_COMISION).setScale(2, RoundingMode.HALF_UP);
             movimiento.setMontoComision(comision);
             movimiento.setIdDependienteComision(dependienteId);
         }
