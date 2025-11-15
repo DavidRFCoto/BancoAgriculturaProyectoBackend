@@ -21,6 +21,9 @@ public class CuentaBancaria {
     @Column(name = "numero_cuenta", nullable = false, length = 30, unique = true)
     private String numeroCuenta;
 
+    @Column(name = "tipo_cuenta", length = 50)
+    private String tipoCuenta;
+
     @Column(name = "saldo", nullable = false, precision = 15, scale = 2)
     private BigDecimal saldo = BigDecimal.ZERO;
 
@@ -53,6 +56,7 @@ public class CuentaBancaria {
         this.numeroCuenta = numeroCuenta;
         this.cliente = cliente;
         this.saldo = BigDecimal.ZERO;
+        this.tipoCuenta = "Cuenta Corriente";
     }
 
     // --- Lifecycle callbacks para timestamps ---
@@ -77,6 +81,9 @@ public class CuentaBancaria {
 
     public String getNumeroCuenta() { return numeroCuenta; }
     public void setNumeroCuenta(String numeroCuenta) { this.numeroCuenta = numeroCuenta; }
+
+    public String getTipoCuenta() { return tipoCuenta; }
+    public void setTipoCuenta(String tipoCuenta) { this.tipoCuenta = tipoCuenta; }
 
     public BigDecimal getSaldo() { return saldo; }
     public void setSaldo(BigDecimal saldo) { this.saldo = saldo; }
